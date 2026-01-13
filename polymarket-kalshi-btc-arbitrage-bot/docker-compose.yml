@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: arbitrage-backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - arbitrage-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/arbitrage"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: arbitrage-frontend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - arbitrage-net
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+
+networks:
+  arbitrage-net:
+    driver: bridge
