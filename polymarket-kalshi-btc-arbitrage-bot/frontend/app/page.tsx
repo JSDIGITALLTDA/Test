@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { AlertCircle, TrendingUp } from "lucide-react"
+import { AlertCircle, TrendingUp, TrendingDown, Minus, DollarSign } from "lucide-react"
 
 interface MarketData {
   timestamp: string
@@ -43,16 +43,38 @@ interface MarketData {
   errors: string[]
 }
 
+interface PremiumData {
+  timestamp: string
+  data: {
+    timestamp: string
+    coinbase_btcusd: number
+    binance_btcusdt: number
+    usd_usdt_rate: number
+    binance_btcusd_adjusted: number
+    premium_usd: number
+    premium_percent: number
+    signal: string
+    warnings: string[] | null
+  } | null
+  error: string | null
+}
+
 export default function Dashboard() {
   const [data, setData] = useState<MarketData | null>(null)
+  const [premiumData, setPremiumData] = useState<PremiumData | null>(null)
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
 
   const fetchData = async () => {
     try {
-      const res = await fetch("http://localhost:8000/arbitrage")
-      const json = await res.json()
-      setData(json)
+      const [arbRes, premiumRes] = await Promise.all([
+        fetch("http://localhost:8000/arbitrage"),
+        fetch("http://localhost:8000/premium")
+      ])
+      const arbJson = await arbRes.json()
+      const premiumJson = await premiumRes.json()
+      setData(arbJson)
+      setPremiumData(premiumJson)
       setLastUpdated(new Date())
       setLoading(false)
     } catch (err) {
@@ -101,6 +123,74 @@ export default function Dashboard() {
             </ul>
           </div>
         </div>
+      )}
+
+      {/* Coinbase Premium Indicator Card */}
+      {premiumData?.data && (
+        <Card className={`border shadow-sm ${
+          premiumData.data.premium_percent > 0.1
+            ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+            : premiumData.data.premium_percent < -0.1
+            ? "bg-gradient-to-r from-red-50 to-rose-50 border-red-200"
+            : "bg-gradient-to-r from-slate-50 to-gray-50 border-slate-200"
+        }`}>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <DollarSign className={`h-5 w-5 ${
+                  premiumData.data.premium_percent > 0.1 ? "text-green-700" :
+                  premiumData.data.premium_percent < -0.1 ? "text-red-700" : "text-slate-700"
+                }`} />
+                <CardTitle>Coinbase Premium</CardTitle>
+              </div>
+              <Badge variant="outline" className={`${
+                premiumData.data.premium_percent > 0.1 ? "bg-green-100 text-green-800 border-green-300" :
+                premiumData.data.premium_percent < -0.1 ? "bg-red-100 text-red-800 border-red-300" :
+                "bg-slate-100 text-slate-800 border-slate-300"
+              }`}>
+                {premiumData.data.signal}
+              </Badge>
+            </div>
+            <CardDescription>BTCUSD (Coinbase) vs BTCUSDT (Binance) - USD/USDT adjusted</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="bg-white/70 p-3 rounded-lg border">
+                <div className="text-xs text-muted-foreground uppercase font-bold">Coinbase BTC/USD</div>
+                <div className="text-lg font-mono font-semibold">${premiumData.data.coinbase_btcusd.toLocaleString()}</div>
+              </div>
+              <div className="bg-white/70 p-3 rounded-lg border">
+                <div className="text-xs text-muted-foreground uppercase font-bold">Binance BTC/USDT</div>
+                <div className="text-lg font-mono font-semibold">${premiumData.data.binance_btcusdt.toLocaleString()}</div>
+              </div>
+              <div className="bg-white/70 p-3 rounded-lg border">
+                <div className="text-xs text-muted-foreground uppercase font-bold">USD/USDT Rate</div>
+                <div className="text-lg font-mono font-semibold">{premiumData.data.usd_usdt_rate.toFixed(5)}</div>
+              </div>
+              <div className="bg-white/70 p-3 rounded-lg border">
+                <div className="text-xs text-muted-foreground uppercase font-bold">Premium (USD)</div>
+                <div className={`text-lg font-mono font-bold flex items-center gap-1 ${
+                  premiumData.data.premium_usd > 0 ? "text-green-700" :
+                  premiumData.data.premium_usd < 0 ? "text-red-700" : "text-slate-700"
+                }`}>
+                  {premiumData.data.premium_usd > 0 ? <TrendingUp className="h-4 w-4" /> :
+                   premiumData.data.premium_usd < 0 ? <TrendingDown className="h-4 w-4" /> :
+                   <Minus className="h-4 w-4" />}
+                  ${Math.abs(premiumData.data.premium_usd).toFixed(2)}
+                </div>
+              </div>
+              <div className="bg-white/70 p-3 rounded-lg border">
+                <div className="text-xs text-muted-foreground uppercase font-bold">Premium (%)</div>
+                <div className={`text-lg font-mono font-bold ${
+                  premiumData.data.premium_percent > 0 ? "text-green-700" :
+                  premiumData.data.premium_percent < 0 ? "text-red-700" : "text-slate-700"
+                }`}>
+                  {premiumData.data.premium_percent > 0 ? "+" : ""}{premiumData.data.premium_percent.toFixed(4)}%
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Best Opportunity Hero Card */}

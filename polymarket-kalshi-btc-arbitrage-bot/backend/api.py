@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fetch_current_polymarket import fetch_polymarket_data_struct
 from fetch_current_kalshi import fetch_kalshi_data_struct
+from coinbase_premium import fetch_coinbase_premium
 import datetime
 
 app = FastAPI()
@@ -143,8 +144,33 @@ def get_arbitrage_data():
             response["opportunities"].append(check_data)
             
         response["checks"].append(check_data)
-        
+
     return response
+
+
+@app.get("/premium")
+def get_coinbase_premium():
+    """
+    Returns the Coinbase Premium indicator data.
+
+    The Coinbase Premium measures the price difference between Coinbase BTCUSD
+    and Binance BTCUSDT, adjusted for the USD/USDT exchange rate.
+
+    Premium = Coinbase_BTCUSD - (Binance_BTCUSDT * USD_USDT_Rate)
+
+    A positive premium indicates strong US demand (bullish signal).
+    A negative premium indicates selling pressure (bearish signal).
+    """
+    data, err = fetch_coinbase_premium()
+
+    response = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "data": data,
+        "error": err
+    }
+
+    return response
+
 
 if __name__ == "__main__":
     import uvicorn
