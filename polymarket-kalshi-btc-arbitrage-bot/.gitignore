@@ -10,8 +10,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
+# Keep frontend lib folder
+!frontend/lib/
 parts/
 sdist/
 var/
