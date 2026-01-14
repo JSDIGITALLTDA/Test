@@ -21,6 +21,7 @@ This project includes:
 
 ## ✨ Features
 
+### Core Features
 -   **Real-Time Monitoring**: Fetches live prices every second.
 -   **Smart Matching**: Automatically matches Polymarket events with their corresponding Kalshi markets.
 -   **Arbitrage Detection**: Instantly identifies "risk-free" trades where the total cost < $1.00.
@@ -30,10 +31,48 @@ This project includes:
     -   **Visual Cost Bars**: Quickly assess the cost breakdown of each strategy.
 -   **Comprehensive Analysis**: Checks multiple strategies (Poly Down + Kalshi Yes, Poly Up + Kalshi No).
 
+### 🚀 Enhanced Features (New!)
+-   **Multi-Market Support**: Trade BTC, sports, politics, and more
+-   **Liquidity Analysis**: Check order book depth to prevent slippage
+-   **Accurate Fee Calculation**: Kalshi's variable fees properly accounted for
+-   **Execution Engine**: Two-leg order placement with risk management
+-   **Dry-Run Mode**: Test strategies without risking capital
+-   **Market Mapping**: Intelligent matching across platforms with resolution validation
+
+> 📚 **New to the bot?** See [API_QUICKSTART.md](API_QUICKSTART.md) for a 5-minute setup guide!
+
 ## 🛠️ Tech Stack
 
 -   **Backend**: Python, FastAPI, Uvicorn, Requests
 -   **Frontend**: TypeScript, Next.js, Tailwind CSS, shadcn/ui, Lucide React
+
+## 🔑 API Setup
+
+Before running the bot, you need API credentials from both platforms:
+
+### Quick Start (5 minutes)
+📖 See **[API_QUICKSTART.md](API_QUICKSTART.md)** for a fast setup guide
+
+### Detailed Guide
+📖 See **[API_SETUP_GUIDE.md](API_SETUP_GUIDE.md)** for complete instructions
+
+### What You Need:
+1. **Kalshi Account**
+   - API Key ID
+   - Private Key (.pem file)
+   - Funded account ($100+)
+
+2. **Polymarket Wallet**
+   - MetaMask wallet
+   - Ethereum private key
+   - USDC on Polygon ($100+)
+
+### Test Your Credentials:
+```bash
+cd backend
+python test_kalshi_api.py      # Test Kalshi connection
+python test_polymarket_api.py  # Test Polymarket connection
+```
 
 ## 📦 Installation
 
@@ -89,6 +128,25 @@ The dashboard will be available at `http://localhost:3000`.
     -   If `Poly Strike < Kalshi Strike`: Checks `Poly Up + Kalshi No`.
 4.  **Calculation**: It sums the cost of the two legs. If `Total Cost < $1.00`, it's an arbitrage opportunity!
 
+## 📚 Documentation
+
+Comprehensive guides for all aspects of the bot:
+
+| Guide | Description | Time |
+|-------|-------------|------|
+| **[API_QUICKSTART.md](API_QUICKSTART.md)** | Get API credentials in 5 minutes | ⚡ 5 min |
+| **[API_SETUP_GUIDE.md](API_SETUP_GUIDE.md)** | Complete API setup with troubleshooting | 📖 15 min |
+| **[QUICK_START.md](QUICK_START.md)** | Deploy to AWS in 5 minutes | 🚀 5 min |
+| **[ADVANCED_GUIDE.md](ADVANCED_GUIDE.md)** | Deep dive into strategy and features | 🎓 30 min |
+| **[ENHANCED_FEATURES.md](ENHANCED_FEATURES.md)** | Technical docs for all modules | 🔧 20 min |
+| **[AWS_DEPLOYMENT_GUIDE.md](AWS_DEPLOYMENT_GUIDE.md)** | Detailed AWS deployment guide | ☁️ 20 min |
+| **[thesis.md](thesis.md)** | Mathematical theory of arbitrage | 📐 10 min |
+
+### Quick Links
+- 🆘 **Troubleshooting**: See [API_SETUP_GUIDE.md#troubleshooting](API_SETUP_GUIDE.md#troubleshooting)
+- 🔒 **Security**: See [ADVANCED_GUIDE.md#risk-management](ADVANCED_GUIDE.md#risk-management)
+- 💰 **Cost Breakdown**: See [QUICK_START.md#costs](QUICK_START.md#costs)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -99,6 +157,19 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4.  Push to the branch (`git push origin feature/AmazingFeature`)
 5.  Open a Pull Request
 
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed guidelines.
+
 ## 📝 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+## ⚠️ Disclaimer
+
+This software is for educational purposes only.
+
+- **No Financial Advice**: This is not financial advice. Use at your own risk.
+- **Trading Risks**: All trading involves risk. Past performance doesn't guarantee future results.
+- **Compliance**: Ensure you comply with local regulations. Polymarket may be restricted in certain jurisdictions.
+- **No Guarantees**: "Risk-free" arbitrage is theoretical. Technical failures and market conditions can cause losses.
+
+Always test thoroughly in dry-run mode before risking real capital.
